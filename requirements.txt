@@ -9,6 +9,7 @@ termcolor
 click
 asciitree
 fastapi
+fastapi[standard]
 weave
 agentops
 langchain
