@@ -9,19 +9,20 @@ die() {
     echo "$*" || exit -1
 }
 
-verify_keys_exist() {
-    # both variables need to be set
-    # see instructions in README.md
-    grep -q GROQ_API_KEY &&
-        grep -q AGENTOPS_API_KEY
+is_key_set() {
+    # README.md contains list of required API keys
+    # and how to get values to set them to.
+    grep -q "$1" .env || die "Set '$1' in .env file. See README.md for instructions."
 }
 
-pyenv local 3                           # use the latest built python3 
-python3 -m venv .venv                   # create a virtual environment
+pyenv local 3                           # use latest built python3 
+python3 -m venv .venv                   # create virtual environment
 source .venv/bin/activate               # use it
-python3 bin/check-python-version.py     # verify that the version is new enough
-pip install --upgrade pip               # get the latest pip
-pip install -r requirements.txt         # install the requirements
+python bin/minimum-version.py 3.10      # verify Python is new enough
+pip install --upgrade pip               # upgrade to latest pip
+pip install -r requirements.txt         # install requirements
 [ -f .env ] || cp .env.example .env     # create .env unless it already exists
-cat .env | verify_keys_exist ||
-    die ".env must set both GROQ_API_KEY and AGENTOPS_API_KEY"
+
+# check that required API keys are set
+is_key_set GROQ_API_KEY
+is_key_set AGENTOPS_API_KEY
